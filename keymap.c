@@ -15,21 +15,17 @@
 // };
 
 // Define custom keycodes for switching layouts
-// enum custom_keycodes {
-//     COMMA_MORPH = SAFE_RANGE,
-//     DOT_MORPH
-// };
+enum custom_keycodes {
+    COMMA_MORPH = SAFE_RANGE,
+    DOT_MORPH
+};
 // Tap Dance declarations
 enum {
-    TD_COMMA_SEMICOLON,
-    TD_DOT_COLON,
     TD_SHIFT_CAPS,
 };
 
 // Tap Dance definitions
 tap_dance_action_t tap_dance_actions[] = {
-    [TD_COMMA_SEMICOLON] = ACTION_TAP_DANCE_DOUBLE(KC_COMMA, KC_SEMICOLON),
-    [TD_DOT_COLON] = ACTION_TAP_DANCE_DOUBLE(KC_DOT, KC_COLON),
     [TD_SHIFT_CAPS] = ACTION_TAP_DANCE_DOUBLE(OSM(MOD_LSFT), KC_CAPS),
 };
 
@@ -54,8 +50,6 @@ tap_dance_action_t tap_dance_actions[] = {
 #define DSK_PREV LGUI(KC_LBRC)  // LGUI + [
 #define DSK_NEXT LGUI(KC_RBRC)  // LGUI + ]
 
-#define COMMA_MORPH TD(TD_COMMA_SEMICOLON)
-#define DOT_MORPH TD(TD_DOT_COLON)
 #define SMART_CAPS TD(TD_SHIFT_CAPS)
 
 // Define Keymaps
@@ -154,4 +148,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                               XXXXXXX,  XXXXXXX, XXXXXXX,  XXXXXXX, XXXXXXX,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
     ),
 };
-#include "encoder.c"
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    static bool shift_held = false;
+
+    switch (keycode) {
+    case DOT_MORPH:
+        if (record->event.pressed) {
+            shift_held = get_mods() & MOD_MASK_SHIFT;
+            if (shift_held) {
+                unregister_mods(MOD_MASK_SHIFT);
+                tap_code16(KC_COLON);  // This sends a colon
+            } else {
+                tap_code(KC_DOT);
+            }
+        }
+        return false;
+    case COMMA_MORPH:
+        if (record->event.pressed) {
+            shift_held = get_mods() & MOD_MASK_SHIFT;
+            if (shift_held) {
+                unregister_mods(MOD_MASK_SHIFT);
+                tap_code(KC_SEMICOLON);  // This sends a semicolon
+            } else {
+                tap_code(KC_COMMA);
+            }
+        }
+        return false;
+    default:
+        return true;
+    }
+}// #include "encoder.c"
