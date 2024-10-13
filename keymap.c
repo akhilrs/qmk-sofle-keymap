@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include "quantum.h"
 #include "layers.h"
 #include "oled.c"
 
@@ -15,31 +16,47 @@
 
 // Define custom keycodes for switching layouts
 // enum custom_keycodes {
-//     KC_QWERTY = SAFE_RANGE,
-//     KC_COLEMAK
+//     COMMA_MORPH = SAFE_RANGE,
+//     DOT_MORPH
 // };
+// Tap Dance declarations
+enum {
+    TD_COMMA_SEMICOLON,
+    TD_DOT_COLON,
+    TD_SHIFT_CAPS,
+};
+
+// Tap Dance definitions
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_COMMA_SEMICOLON] = ACTION_TAP_DANCE_DOUBLE(KC_COMMA, KC_SEMICOLON),
+    [TD_DOT_COLON] = ACTION_TAP_DANCE_DOUBLE(KC_DOT, KC_COLON),
+    [TD_SHIFT_CAPS] = ACTION_TAP_DANCE_DOUBLE(OSM(MOD_LSFT), KC_CAPS),
+};
 
 // Left-hand home row mods
-#define HOME_A LGUI_T(KC_A)
-#define HOME_R LALT_T(KC_R)
-#define HOME_S LSFT_T(KC_S)
-#define HOME_T LCTL_T(KC_T)
+#define HOME_A MT(MOD_LGUI, KC_A)
+#define HOME_R MT(MOD_LALT, KC_R)
+#define HOME_S MT(MOD_LSFT, KC_S)
+#define HOME_T MT(MOD_LCTL, KC_T)
 
 // Right-hand home row mods
-#define HOME_N RCTL_T(KC_N)
-#define HOME_E RSFT_T(KC_E)
-#define HOME_I LALT_T(KC_I)
-#define HOME_O RGUI_T(KC_O)
+#define HOME_N MT(MOD_RCTL, KC_N)
+#define HOME_E MT(MOD_RSFT, KC_E)
+#define HOME_I MT(MOD_LALT, KC_I)
+#define HOME_O MT(MOD_RGUI, KC_O)
 
 // Layer-Tap definitions for thumb cluster
 #define LT_NUM_SPC LT(_NUM, KC_SPC)     // Tap for Space, Hold for Num layer
 #define LT_SYM_ENT LT(_SYM, KC_ENT)     // Tap for Enter, Hold for Sym layer
 #define LT_TAB_NAV LT(_NAV, KC_TAB)     // Tap for Tab, Hold for Nav layer
 #define LT_FUN_SYS LT(_FUNC, KC_LGUI)   // Tap for GUI, Hold for Func layer
-#define SMART_CAPS LT(KC_CAPS, KC_LSFT) // Tap for CW Toggle, Hold for Caps Lock
 
 #define DSK_PREV LGUI(KC_LBRC)  // LGUI + [
 #define DSK_NEXT LGUI(KC_RBRC)  // LGUI + ]
+
+#define COMMA_MORPH TD(TD_COMMA_SEMICOLON)
+#define DOT_MORPH TD(TD_DOT_COLON)
+#define SMART_CAPS TD(TD_SHIFT_CAPS)
 
 // Define Keymaps
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -50,9 +67,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                    ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
         XXXXXXX,  KC_Q,     KC_W,     KC_F,     KC_P,     KC_B,                          KC_J,     KC_L,     KC_U,     KC_Y,     KC_QUOT,  XXXXXXX,
     // ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                    ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-        XXXXXXX,  HOME_A,   HOME_R,   HOME_S,   HOME_T,   KC_G,                          KC_H,     HOME_N,   HOME_E,   HOME_I,   HOME_O,   XXXXXXX,
+        XXXXXXX,  HOME_A,   HOME_R,   HOME_S,   HOME_T,   KC_G,                          KC_M,     HOME_N,   HOME_E,   HOME_I,   HOME_O,   XXXXXXX,
     // ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                    ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-        XXXXXXX,  KC_Z,     KC_X,     KC_C,     KC_D,     KC_V,     KC_MUTE,    XXXXXXX, KC_K,     KC_M,     KC_COMM,  KC_DOT,   KC_SLSH,  XXXXXXX,
+        XXXXXXX,  KC_Z,     KC_X,     KC_C,     KC_D,     KC_V,     KC_MUTE,    XXXXXXX, KC_K,     KC_H,     COMMA_MORPH,DOT_MORPH,KC_SLSH,XXXXXXX,
     // └─────────┴─────────┴─────────┴─────────┴─────────┴─────────┘                    └─────────┴─────────┴─────────┴─────────┴─────────┴─────────┘
                       XXXXXXX,  XXXXXXX,  LT_FUN_SYS, LT_TAB_NAV, LT_SYM_ENT,  LT_NUM_SPC, SMART_CAPS, MO(_MOUSE), XXXXXXX,  XXXXXXX
                                         // Left Thumb Cluster                                  // Right Thumb Cluster
@@ -90,9 +107,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     // ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                    ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
         XXXXXXX,  KC_DOT,   KC_LT,    KC_GT,    KC_DQUO,  KC_QUOT,                       KC_AMPR,  KC_DLR,   KC_LBRC,  KC_RBRC,  KC_PERC,  XXXXXXX,
     // ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                    ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-        XXXXXXX,  KC_EXLM,  KC_MINS,  KC_PLUS,  KC_EQL,   KC_HASH,                       KC_PIPE,  KC_COLN,  KC_LPRN,  KC_RPRN,  XXXXXXX,  XXXXXXX,
+        XXXXXXX,  KC_EXLM,  KC_MINS,  KC_PLUS,  KC_EQL,   KC_HASH,                       KC_PIPE,  KC_COLN,  KC_LPRN,  KC_RPRN,  KC_QUES,  XXXXXXX,
     // ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤                    ├─────────┼─────────┼─────────┼─────────┼─────────┼─────────┤
-        XXXXXXX,  KC_GRV,   KC_SLSH,  KC_ASTR,  KC_BSLS,  KC_UNDS,  XXXXXXX,    XXXXXXX, KC_TILD,  KC_CIRC,  KC_LBRC,  KC_RBRC,  XXXXXXX,  XXXXXXX,
+        XXXXXXX,  KC_GRV,   KC_SLSH,  KC_ASTR,  KC_BSLS,  KC_UNDS,  XXXXXXX,    XXXXXXX, KC_TILD,  KC_CIRC,  KC_LBRC,  KC_RBRC,  KC_AT,  XXXXXXX,
     // └─────────┴─────────┴─────────┴─────────┴─────────┴─────────┘                    └─────────┴─────────┴─────────┴─────────┴─────────┴─────────┘
                               XXXXXXX,  XXXXXXX, XXXXXXX,  KC_LCTL, XXXXXXX,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
     ),
@@ -137,39 +154,4 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                               XXXXXXX,  XXXXXXX, XXXXXXX,  XXXXXXX, XXXXXXX,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX
     ),
 };
-//
-// /* Custom keycode functionality */
-// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-//     switch (keycode) {
-//         case KC_COLEMAK:
-//             if (record->event.pressed) {
-//                 set_single_persistent_default_layer(_COLEMAK);
-//             }
-//             return false;
-//         case KC_QWERTY:
-//             if (record->event.pressed) {
-//                 set_single_persistent_default_layer(_QWERTY);
-//             }
-//             return false;
-//     }
-//     return true;
-// }
-/* Encoder functionality */
-#ifdef ENCODER_ENABLE
-bool encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) {  // Left encoder
-        if (clockwise) {
-            tap_code(KC_VOLU);  // Volume up
-        } else {
-            tap_code(KC_VOLD);  // Volume down
-        }
-    } else if (index == 1) {  // Right encoder
-        if (clockwise) {
-            tap_code(KC_PGUP);  // Page up
-        } else {
-            tap_code(KC_PGDN);  // Page down
-        }
-    }
-    return true;
-}
-#endif
+#include "encoder.c"
